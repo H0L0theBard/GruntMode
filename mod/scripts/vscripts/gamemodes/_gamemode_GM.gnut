@@ -1,0 +1,58 @@
+global function GamemodeGruntMode_Init
+
+void function GamemodeGruntMode_Init()
+{
+	SetSpawnpointGamemodeOverride( TEAM_DEATHMATCH )
+	ClassicMP_ForceDisableEpilogue( true )
+	AddCallback_OnPlayerKilled( OnPlayerKilled )
+
+	SetWeaponDropsEnabled( false )
+
+	Riff_ForceTitanAvailability( eTitanAvailability.Never )
+	Riff_ForceBoostAvailability( eBoostAvailability.Disabled )
+
+	AddCallback_OnPlayerRespawned( OnPlayerRespawned )
+	AddCallback_OnPlayerGetsNewPilotLoadout( OnPlayerChangeLoadout)
+	
+
+	
+}
+
+void function OnPlayerKilled( entity victim, entity attacker, var damageInfo )
+{
+	if ( victim != attacker && victim.IsPlayer() && attacker.IsPlayer() && GetGameState() == eGameState.Playing )
+	{
+		AddTeamScore( attacker.GetTeam(), 1 )
+		attacker.AddToPlayerGameStat( PGS_ASSAULT_SCORE, 1 )
+	}
+}
+
+void function OnPlayerRespawned( entity player )
+{	player.SetPlayerSettingsWithMods( player.GetPlayerSettings(), [ "disable_wallrun", "disable_doublejump"])
+ 
+	foreach ( entity weapon in player.GetMainWeapons() )
+		player.TakeWeaponNow( weapon.GetWeaponClassName() )
+
+	foreach ( entity weapon in player.GetOffhandWeapons() )
+		player.TakeWeaponNow( weapon.GetWeaponClassName() )
+
+	player.GiveWeapon( "mp_weapon_rspn101")
+	player.GiveOffhandWeapon( "melee_pilot_emptyhanded", OFFHAND_MELEE)
+	player.GiveOffhandWeapon( "mp_weapon_frag_grenade", OFFHAND_ORDNANCE)
+
+}
+
+void function OnPlayerChangeLoadout( entity player , PilotLoadoutDef p)
+{	
+ 
+	foreach ( entity weapon in player.GetMainWeapons() )
+		player.TakeWeaponNow( weapon.GetWeaponClassName() )
+
+	foreach ( entity weapon in player.GetOffhandWeapons() )
+		player.TakeWeaponNow( weapon.GetWeaponClassName() )
+
+	player.GiveWeapon( "mp_weapon_rspn101")
+	player.GiveOffhandWeapon( "melee_pilot_emptyhanded", OFFHAND_MELEE)
+	player.GiveOffhandWeapon( "mp_weapon_frag_grenade", OFFHAND_ORDNANCE)
+
+}

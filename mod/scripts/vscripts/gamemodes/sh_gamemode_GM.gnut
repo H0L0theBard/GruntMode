@@ -1,0 +1,38 @@
+global function Sh_GamemodeGM_Init
+
+global const string GAMEMODE_GruntMode = "GM"
+
+
+void function Sh_GamemodeGM_Init()
+{
+	// create custom gamemode
+	AddCallback_OnCustomGamemodesInit( CreateGamemodeGruntMode )
+
+}
+
+void function CreateGamemodeGruntMode()
+{
+	GameMode_Create( GAMEMODE_GruntMode )
+	GameMode_SetName( GAMEMODE_GruntMode, "Grunt Mode" )
+	GameMode_SetDesc( GAMEMODE_GruntMode, "Well you're now a grunt" )
+	GameMode_SetGameModeAnnouncement( GAMEMODE_GruntMode, "ffa_modeDesc" )
+	GameMode_SetColor( GAMEMODE_GruntMode, [153,2,2, 255] )
+	
+	AddPrivateMatchMode( GAMEMODE_GruntMode ) // add to private lobby modes
+
+	
+	#if SERVER
+		GameMode_AddServerInit( GAMEMODE_GruntMode, GamemodeGruntMode_Init )
+
+
+		GameMode_SetPilotSpawnpointsRatingFunc( GAMEMODE_GruntMode, RateSpawnpoints_Generic )
+		GameMode_SetTitanSpawnpointsRatingFunc( GAMEMODE_GruntMode, RateSpawnpoints_Generic )
+	#elseif CLIENT
+		GameMode_AddClientInit( GAMEMODE_GruntMode, ClGamemodeGM_Init )
+	#endif
+	#if !UI
+		GameMode_SetScoreCompareFunc( GAMEMODE_GruntMode, CompareAssaultScore )
+		
+	#endif
+}
+
